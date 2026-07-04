@@ -12,6 +12,21 @@ Aplikasi frontend simulasi pembayaran tagihan (PLN, PDAM, Internet, Seminar) dan
 
 ---
 
+---
+
+## 📸 Screenshot
+
+### 💻 Desktop
+| Dashboard | Bayar Tagihan | SPP |
+|-----------|---------------|-----|
+| ![Dashboard](assets/img/desktop-dashboard.png) | ![Tagihan](assets/img/desktop-tagihan.png) | ![SPP](assets/img/desktop-spp.png) |
+
+| Isi Pulsa | Riwayat | Profil |
+|-----------|---------|--------|
+| ![Pulsa](assets/img/desktop-pulsa.png) | ![Riwayat](assets/img/desktop-riwayat.png) | ![Profil](assets/img/desktop-profil.png) |
+
+---
+
 ## ✨ Fitur Utama
 
 ### 🔹 Dashboard
