@@ -8,118 +8,173 @@ Aplikasi frontend simulasi pembayaran tagihan (PLN, PDAM, Internet, Seminar) dan
 
 ## 🚀 Demo Live
 
-> 🔗 *[https://username.github.io/seumpamabayar](https://username.github.io/seumpamabayar)* *(ganti dengan URL deploy Anda)*
-
----
-
-## 📸 Screenshot
-
-### 💻 Desktop
-| Dashboard | Bayar Tagihan | SPP |
-|-----------|---------------|-----|
-| ![Dashboard](assets/img/desktop-dashboard.png) | ![Tagihan](assets/img/desktop-tagihan.png) | ![SPP](assets/img/desktop-spp.png) |
-
-| Isi Pulsa | Riwayat | Profil |
-|-----------|---------|--------|
-| ![Pulsa](assets/img/desktop-pulsa.png) | ![Riwayat](assets/img/desktop-riwayat.png) | ![Profil](assets/img/desktop-profil.png) |
-
-### 📱 Mobile
-| Dashboard | Bayar Tagihan | SPP |
-|-----------|---------------|-----|
-| ![Dashboard](assets/img/mobile-dashboard.png) | ![Tagihan](assets/img/mobile-tagihan.png) | ![SPP](assets/img/mobile-spp.png) |
+🔗 **Live Demo:** [https://quinc3.github.io/SeumpamaBayar](https://quinc3.github.io/SeumpamaBayar)
 
 ---
 
 ## ✨ Fitur Utama
 
 ### 🔹 Dashboard
-- Ringkasan saldo simulasi
-- Statistik: total transaksi, tagihan aktif, pengeluaran bulanan
-- Grafik pengeluaran 6 bulan terakhir (Chart.js)
-- Promo banner interaktif
-- Quick access 6 layanan (PLN, PDAM, Internet, SPP, Seminar, Pulsa)
-- Riwayat transaksi terakhir
+- Ringkasan saldo, statistik transaksi, grafik pengeluaran (Chart.js)
+- Quick access 6 layanan, promo banner, riwayat terakhir
 
 ### 🔹 Bayar Tagihan
-- **4 kategori**: PLN, PDAM, Internet, Seminar/Event
-- Input nomor pelanggan + validasi real-time
-- Cek tagihan dengan loading state
-- Detail tagihan lengkap (nama, alamat, periode, denda, jatuh tempo)
-- **3 metode pembayaran**:
-  - 🏦 **Virtual Account** — Generate nomor VA unik (BCA, BNI, Mandiri)
-  - 📱 **QRIS** — QR Code asli (QRCode.js) + countdown 5 menit
-  - 🏪 **Teller/Kasir** — Kode bayar + copy ke clipboard
+- 4 kategori: PLN, PDAM, Internet, Seminar
+- Cek tagihan, detail lengkap, 3 metode pembayaran (VA, QRIS, Teller)
+- QR Code QRIS asli (QRCode.js), countdown 5 menit
+- Cetak struk (Print & Download PDF via jsPDF)
 
 ### 🔹 Biaya Kuliah (SPP)
-- Input NIM + validasi format
-- Progress bar pembayaran semester
-- Daftar cicilan 6-8 item dengan status Lunas/Belum
-- Pilih beberapa cicilan sekaligus (checkbox + select all)
-- Total otomatis terhitung
+- Input NIM, daftar cicilan 6-8 item, progress bar, multi-select
 
 ### 🔹 Isi Pulsa & Paket Data
-- **6 provider**: Telkomsel, XL, Indosat, Tri, Smartfren, Axis
-- Deteksi provider otomatis dari prefix nomor HP
-- Tab Pulsa Reguler + Paket Data
-- Nominal pulsa: Rp 5.000 - Rp 200.000 + custom input
-- Paket data berbeda tiap provider
+- 6 provider, deteksi otomatis, pulsa & paket data, custom nominal
 
 ### 🔹 Riwayat Transaksi
-- Semua transaksi tersimpan di LocalStorage
-- Filter: jenis, status, rentang tanggal
-- Search by keyword
-- Sort: terbaru, terlama, termahal, termurah
-- Export CSV
-- Hapus satu / hapus semua (dengan konfirmasi)
-- Cetak struk (Print window)
-- Download struk PDF (jsPDF)
+- Filter, search, sort, export CSV, cetak ulang struk
 
-### 🔹 Profil Pengguna
-- Edit nama, email, nomor HP, inisial avatar
-- Statistik transaksi pribadi
-- Data tersimpan di LocalStorage
-
-### 🔹 FAQ / Bantuan
-- 8 pertanyaan umum
-- Search FAQ by keyword
-- Accordion interaktif + keyboard accessible
-- Kontak WhatsApp & Email
+### 🔹 Profil & FAQ
+- Edit profil, statistik pribadi, halaman bantuan
 
 ### 🔹 Dark Mode
-- Toggle light/dark theme
-- Preferensi tema disimpan di LocalStorage
-- Transisi halus antar tema
-
-### 🔹 Fitur Pendukung
-- ✅ Responsive design (mobile, tablet, desktop)
-- ✅ Validasi form real-time
-- ✅ Toast notification (sukses, error, info)
-- ✅ Loading spinner setiap proses
-- ✅ Modal konfirmasi sebelum bayar
-- ✅ Copy VA / kode bayar ke clipboard
-- ✅ Hover effects di semua elemen interaktif
-- ✅ Animasi transisi (fade in, slide in)
-- ✅ Keyboard accessible (Enter/Space)
-- ✅ ARIA labels untuk accessibility
-- ✅ Breadcrumb navigasi
-- ✅ Edge cases handled (saldo kurang, tagihan lunas, NIM tidak ditemukan)
+- Toggle light/dark, preferensi disimpan
 
 ---
 
 ## 🛠 Teknologi
 
-| Teknologi | Versi | Kegunaan |
-|-----------|-------|----------|
-| **HTML5** | — | Struktur halaman semantic |
-| **CSS3** | — | Custom properties, Flexbox, Grid, Animasi |
-| **Bootstrap 5** | 5.3.0 (CDN) | UI framework |
-| **Bootstrap Icons** | 1.11.0 (CDN) | Icon library |
-| **Vanilla JavaScript** | ES6+ | DOM manipulation, event handling, state |
-| **Chart.js** | 4.x (CDN) | Grafik pengeluaran dashboard |
-| **QRCode.js** | 1.0.0 (CDN) | Generate QR code QRIS |
-| **jsPDF** | 2.5.1 (CDN) | Export struk ke PDF |
-| **LocalStorage** | — | Penyimpanan data client-side |
+| Teknologi | Via |
+|-----------|-----|
+| HTML5, CSS3, JavaScript ES6+ | Native |
+| Bootstrap 5.3, Bootstrap Icons 1.11 | CDN |
+| Chart.js 4.x, QRCode.js 1.0, jsPDF 2.5 | CDN |
+| LocalStorage | Browser API |
 
 ---
 
 ## 📁 Struktur Proyek
+
+SeumpamaBayar/
+├── index.html # Dashboard
+├── bayar-tagihan.html # Bayar Tagihan
+├── spp.html # Biaya Kuliah
+├── pulsa.html # Isi Pulsa
+├── riwayat.html # Riwayat Transaksi
+├── profil.html # Profil
+├── faq.html # Bantuan
+├── README.md
+└── assets/
+├── css/
+│ └── style.css
+└── js/
+├── data.js # Data dummy
+├── storage.js # LocalStorage helper
+├── utils.js # Fungsi utilitas
+├── dashboard.js # Logic Dashboard
+├── tagihan.js # Logic Bayar Tagihan
+├── spp.js # Logic SPP
+├── pulsa.js # Logic Isi Pulsa
+└── riwayat.js # Logic Riwayat
+
+
+---
+
+## 🔧 Cara Menjalankan
+
+### Metode 1: Buka Langsung
+1. Clone atau download repository ini
+2. Ekstrak file ZIP (jika download)
+3. Buka `index.html` di browser (Chrome/Firefox/Edge)
+4. Tidak perlu server atau database
+
+### Metode 2: Live Server (VS Code)
+1. Buka folder project di VS Code
+2. Install extension Live Server
+3. Klik kanan `index.html` → Open with Live Server
+
+---
+
+## 📋 Data Dummy
+
+### Tagihan
+| Kategori | ID Contoh |
+|----------|-----------|
+| PLN | `123456789012` |
+| PDAM | `PDAM001` |
+| Internet | `INET001` |
+| Seminar | `EVT2024` (bebas) |
+
+### SPP (NIM)
+| NIM | Nama | Cicilan |
+|-----|------|---------|
+| `2024001` | Andi Pratama | 6 cicilan @Rp 2.500.000 |
+| `2024002` | Bunga Citra | 8 cicilan @Rp 2.000.000 |
+| `2024003` | Cindy Permata | 6 cicilan @Rp 3.000.000 |
+
+### Provider Pulsa (Deteksi Otomatis)
+| Provider | Prefix |
+|----------|--------|
+| Telkomsel | 0812, 0813, 0821, 0822, dst. |
+| Indosat | 0814, 0815, 0855, dst. |
+| XL | 0817, 0818, 0877, dst. |
+| Tri | 0895, 0896, 0897, dst. |
+| Smartfren | 0881-0888 |
+| Axis | 0831, 0832, 0833, 0838 |
+
+---
+
+## 🎯 Checklist Fitur
+
+### Fitur Wajib (100%)
+- [x] Dashboard dengan saldo & statistik
+- [x] Bayar Tagihan (PLN, PDAM, Internet, Seminar)
+- [x] Biaya Kuliah / SPP (NIM, cicilan, progress bar, multi-select)
+- [x] Isi Pulsa & Paket Data (6 provider, deteksi otomatis)
+- [x] Riwayat Transaksi (filter, search, sort, export)
+- [x] 3 Metode Pembayaran (VA, QRIS, Teller)
+- [x] Validasi form real-time
+- [x] Loading spinner, toast notification
+- [x] Modal konfirmasi & sukses
+- [x] Cetak struk (Print & PDF via jsPDF)
+- [x] QR Code QRIS asli (QRCode.js)
+- [x] Responsive design (mobile, tablet, desktop)
+- [x] LocalStorage
+
+### Nilai Tambah
+- [x] Chart.js grafik pengeluaran
+- [x] Dark/Light mode toggle
+- [x] Halaman Profil (edit + statistik)
+- [x] Halaman FAQ / Bantuan (search, accordion)
+- [x] Export CSV riwayat
+- [x] Filter by date range
+- [x] Copy VA / kode bayar
+- [x] Countdown timer QRIS 5 menit
+- [x] VA per bank (BCA, BNI, Mandiri)
+- [x] Custom input nominal pulsa
+- [x] Hover effects + animasi
+- [x] Progress bar SPP
+- [x] Keyboard accessible + ARIA labels
+- [x] Edge cases handling
+
+---
+
+## 👤 Author
+
+| | |
+|---|---|
+| **Nama** | Fariz Afdilah Muhamad |
+| **NIM** | 221011450661 |
+| **Kelas** | TPLE 002 |
+| **Mata Kuliah** | Pemrograman Web 2 / Frontend Development |
+| **Semester** | 7 |
+| **GitHub** | [@Quinc3](https://github.com/Quinc3) |
+
+---
+
+## 📝 Lisensi
+
+Proyek ini dibuat untuk keperluan **akademis** (UAS Pemrograman Web 2). Tidak untuk produksi.
+
+---
+
+© 2026 SeumpamaBayar. All rights reserved.

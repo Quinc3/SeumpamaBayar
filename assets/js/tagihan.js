@@ -7,7 +7,6 @@ let saldo = Storage ? Storage.get('saldo', 1250000) : 1250000;
 
 // Init
 document.addEventListener('DOMContentLoaded', function () {
-    // Cek apakah ada kategori dari dashboard
     const savedKategori = sessionStorage.getItem('selectedKategori');
     if (savedKategori) {
         selectedKategori = savedKategori;
@@ -22,7 +21,23 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('idPelanggan').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') cekTagihan();
     });
+
+    initTheme();
+    updateThemeIcon();
 });
+
+function toggleThemeButton() {
+    const theme = toggleTheme();
+    updateThemeIcon();
+    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+}
+
+function updateThemeIcon() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+}
 
 function pilihKategori(kategori, el) {
     selectedKategori = kategori;
@@ -109,6 +124,14 @@ function cekTagihan() {
         return;
     }
 
+    // ✅ Cek tagihan sudah lunas (DIPINDAHKAN KE SINI)
+    const tagihanLunas = Storage.get('tagihanLunas', []);
+    if (tagihanLunas.includes(idPelanggan + '_' + selectedKategori)) {
+        inputEl.classList.add('is-invalid');
+        errorEl.textContent = 'Tagihan ini sudah lunas';
+        return;
+    }
+
     let dataPelanggan = null;
 
     if (selectedKategori === 'PLN') {
@@ -118,7 +141,6 @@ function cekTagihan() {
     } else if (selectedKategori === 'Internet') {
         dataPelanggan = internetData.find(p => p.id === idPelanggan);
     } else if (selectedKategori === 'seminar') {
-        // Untuk seminar, langsung buat data dummy dari ID yang diinput
         dataPelanggan = {
             id: idPelanggan,
             nama: 'Peserta: ' + idPelanggan,
@@ -132,7 +154,6 @@ function cekTagihan() {
         return;
     }
 
-    // Tampilkan loading sebentar
     showLoading();
     setTimeout(() => {
         hideLoading();
@@ -140,19 +161,6 @@ function cekTagihan() {
         renderHasilTagihan();
         document.getElementById('hasilTagihan').scrollIntoView({ behavior: 'smooth' });
     }, 600);
-
-    // Cek tagihan sudah lunas
-    const tagihanList = Storage.get('tagihanLunas', []);
-    if (tagihanList.includes(idPelanggan + '_' + selectedKategori)) {
-        inputEl.classList.add('is-invalid');
-        errorEl.textContent = 'Tagihan ini sudah lunas';
-        return;
-    }
-
-    // Setelah bayar sukses, tandai lunas
-    const lunas = Storage.get('tagihanLunas', []);
-    lunas.push(currentTagihan.idPelanggan + '_' + currentTagihan.jenis);
-    Storage.set('tagihanLunas', lunas);
 }
 
 function renderHasilTagihan() {
@@ -233,7 +241,6 @@ function pilihMetode(metode, el) {
     const detailDiv = document.getElementById('metodeDetail');
     const totalBayar = currentTagihan.total + currentTagihan.denda;
 
-    // Clear QR container if exists
     detailDiv.innerHTML = '';
 
     if (metode === 'va') {
@@ -264,7 +271,6 @@ function pilihMetode(metode, el) {
                 <div class="text-danger small"><i class="bi bi-clock me-1"></i>Berlaku: <span id="countdownTagihan">05:00</span></div>
             </div>`;
 
-        // Generate QR code asli
         setTimeout(() => {
             const qrContainer = document.getElementById('qrcodeContainerTagihan');
             if (qrContainer) {
@@ -287,7 +293,6 @@ function pilihMetode(metode, el) {
             </div>`;
     }
 
-    // Tampilkan ringkasan + tombol bayar
     document.getElementById('ringkasanBayar').style.display = 'block';
     document.getElementById('ringkasanBayar').innerHTML = `
         <div class="card card-custom fade-in">
@@ -303,6 +308,28 @@ function pilihMetode(metode, el) {
         </div>`;
 
     document.getElementById('ringkasanBayar').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ✅ Fungsi gantiBank() DITAMBAHKAN
+function gantiBank(bank) {
+    const vaData = generateVA(bank);
+    const detailDiv = document.getElementById('metodeDetail');
+    detailDiv.innerHTML = `
+        <div class="text-center p-3 bg-light rounded-3 fade-in">
+            <i class="bi bi-bank fs-3 text-primary"></i>
+            <p class="fw-bold mb-1 mt-2">Virtual Account - ${vaData.bank}</p>
+            <p class="fs-5 text-primary fw-bold mb-2">${vaData.number}</p>
+            <small class="text-muted">a.n SeumpamaBayar</small><br>
+            <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${vaData.number}')">
+                <i class="bi bi-copy me-1"></i>Salin VA
+            </button>
+            <div class="mt-2">
+                <small class="text-muted">Ganti bank:</small><br>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBank('BCA')">BCA</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBank('BNI')">BNI</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBank('Mandiri')">Mandiri</button>
+            </div>
+        </div>`;
 }
 
 function konfirmasiBayar() {
@@ -366,16 +393,19 @@ function prosesBayar() {
             }
         };
 
-        // Simpan ke storage
         if (typeof Storage !== 'undefined') {
             const riwayat = Storage.get('riwayat', []);
             riwayat.unshift(transaksi);
             Storage.set('riwayat', riwayat);
             saldo -= totalBayar;
             Storage.set('saldo', saldo);
+
+            // ✅ Tandai lunas (DIPINDAHKAN KE SINI)
+            const tagihanLunas = Storage.get('tagihanLunas', []);
+            tagihanLunas.push(currentTagihan.idPelanggan + '_' + currentTagihan.jenis);
+            Storage.set('tagihanLunas', tagihanLunas);
         }
 
-        // Tampilkan sukses
         document.getElementById('modalSuksesBody').innerHTML = `
             <i class="bi bi-check-circle fs-1 text-success"></i>
             <h5 class="mt-3">Pembayaran Berhasil!</h5>
@@ -394,7 +424,6 @@ function prosesBayar() {
     }, 2000);
 }
 
-// ==================== CETAK STRUK (PRINT & PDF) ====================
 function cetakStruk(id) {
     const transaksi = Storage ? Storage.get('riwayat', []).find(t => t.id === id) : null;
     if (!transaksi) {
@@ -402,7 +431,6 @@ function cetakStruk(id) {
         return;
     }
 
-    // Buat modal pilihan cetak
     const modalPilihan = document.createElement('div');
     modalPilihan.innerHTML = `
         <div class="modal fade" id="modalPilihanCetakTagihan" tabindex="-1">
@@ -429,7 +457,6 @@ function cetakStruk(id) {
     const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetakTagihan'));
     modal.show();
 
-    // Event: Print
     document.getElementById('btnPrintStrukTagihan').onclick = function () {
         modal.hide();
         const win = window.open('', '_blank', 'width=400,height=600');
@@ -449,8 +476,7 @@ function cetakStruk(id) {
             </style></head>
             <body>
                 <h3>🌱 SeumpamaBayar</h3>
-                <p class="subtitle">Struk Pembayaran Digital</p>
-                <hr>
+                <p class="subtitle">Struk Pembayaran Digital</p><hr>
                 <table>
                     <tr><td class="label">ID</td><td>: ${transaksi.id}</td></tr>
                     <tr><td class="label">Tanggal</td><td>: ${formatTanggal(transaksi.tanggal)}</td></tr>
@@ -458,10 +484,8 @@ function cetakStruk(id) {
                     <tr><td class="label">Jenis</td><td>: ${transaksi.jenis}</td></tr>
                     <tr><td class="label">Deskripsi</td><td>: ${transaksi.deskripsi}</td></tr>
                     <tr><td class="label">Metode</td><td>: ${transaksi.metode}</td></tr>
-                </table>
-                <hr>
-                <p class="total">${formatRupiah(transaksi.total)}</p>
-                <hr>
+                </table><hr>
+                <p class="total">${formatRupiah(transaksi.total)}</p><hr>
                 <p class="footer">Terima kasih telah menggunakan<br>SeumpamaBayar</p>
             </body></html>
         `);
@@ -470,7 +494,6 @@ function cetakStruk(id) {
         cleanup();
     };
 
-    // Event: PDF
     document.getElementById('btnPDFStrukTagihan').onclick = function () {
         modal.hide();
         if (typeof exportPDF === 'function') {
@@ -482,7 +505,6 @@ function cetakStruk(id) {
         cleanup();
     };
 
-    // Cleanup
     function cleanup() {
         setTimeout(() => {
             if (document.body.contains(modalPilihan)) {
@@ -492,21 +514,4 @@ function cetakStruk(id) {
     }
 
     document.getElementById('modalPilihanCetakTagihan').addEventListener('hidden.bs.modal', cleanup);
-}
-
-// Init theme
-initTheme();
-updateThemeIcon();
-
-function toggleThemeButton() {
-    const theme = toggleTheme();
-    updateThemeIcon();
-    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
-}
-
-function updateThemeIcon() {
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
 }

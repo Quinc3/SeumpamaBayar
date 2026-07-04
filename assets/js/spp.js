@@ -9,18 +9,28 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('nimInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') cekSPP();
     });
+
+    initTheme();
+    updateThemeIcon();
 });
+
+function toggleThemeButton() {
+    const theme = toggleTheme();
+    updateThemeIcon();
+    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+}
+
+function updateThemeIcon() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+}
 
 function cekSPP() {
     const nim = document.getElementById('nimInput').value.trim();
     const errorEl = document.getElementById('nimError');
     const inputEl = document.getElementById('nimInput');
-    // Cek semua cicilan sudah lunas
-    const semuaLunas = mhsAktif.cicilan.every(c => c.status === 'lunas');
-    if (semuaLunas) {
-        showToast('Semua cicilan sudah lunas! 🎉', 'info');
-        // Tetap tampilkan data
-    }
 
     errorEl.textContent = '';
     inputEl.classList.remove('is-invalid');
@@ -45,6 +55,12 @@ function cekSPP() {
         return;
     }
 
+    // ✅ Cek semua lunas — DIPINDAHKAN ke sini
+    const semuaLunas = mhsAktif.cicilan.every(c => c.status === 'lunas');
+    if (semuaLunas) {
+        showToast('Semua cicilan sudah lunas! 🎉', 'info');
+    }
+
     renderDataSPP();
 }
 
@@ -57,7 +73,6 @@ function renderDataSPP() {
     document.getElementById('hasilSPP').style.display = 'block';
     document.getElementById('hasilSPP').innerHTML = `
     <div class="fade-in">
-        <!-- Info Mahasiswa -->
         <div class="card card-custom mb-4">
             <div class="card-body">
                 <div class="row align-items-center">
@@ -82,14 +97,13 @@ function renderDataSPP() {
             </div>
         </div>
 
-        <!-- Daftar Cicilan -->
         <h6 class="fw-bold mb-3"><i class="bi bi-list-check me-2"></i>Daftar Cicilan</h6>
         <div class="table-container card-custom mb-3 overflow-hidden">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" role="table" aria-label="Daftar cicilan SPP">
                 <thead class="table-light">
                     <tr>
                         <th width="50">
-                            <input type="checkbox" id="checkAll" onchange="toggleAll(this)">
+                            <input type="checkbox" id="checkAll" onchange="toggleAll(this)" aria-label="Pilih semua cicilan">
                         </th>
                         <th>Kode</th>
                         <th>Deskripsi</th>
@@ -105,8 +119,8 @@ function renderDataSPP() {
                             ${c.status === 'belum' ?
             `<input type="checkbox" class="cicilan-check" value="${c.id}" 
                                         data-jumlah="${c.jumlah}" data-deskripsi="${c.deskripsi}"
-                                        onchange="updateTotal()">` :
-            '<i class="bi bi-check-circle-fill text-success"></i>'}
+                                        onchange="updateTotal()" aria-label="Pilih ${c.deskripsi}">` :
+            '<i class="bi bi-check-circle-fill text-success" aria-label="Sudah lunas"></i>'}
                         </td>
                         <td><small class="fw-medium">${c.id}</small></td>
                         <td>${c.deskripsi}</td>
@@ -130,9 +144,8 @@ function renderDataSPP() {
             </table>
         </div>
 
-        <!-- Tombol Lanjut -->
         <div class="text-end">
-            <button class="btn btn-primary" id="btnLanjutBayar" disabled onclick="lanjutPembayaran()">
+            <button class="btn btn-primary" id="btnLanjutBayar" disabled onclick="lanjutPembayaran()" aria-label="Lanjut ke pembayaran">
                 <i class="bi bi-arrow-right me-1"></i> Lanjut ke Pembayaran
             </button>
         </div>
@@ -181,23 +194,23 @@ function lanjutPembayaran() {
                 <i class="bi bi-credit-card me-2"></i> Pilih Metode Pembayaran
             </div>
             <div class="card-body">
-                <div class="row g-3 mb-3">
+                <div class="row g-3 mb-3" role="radiogroup" aria-label="Pilih metode pembayaran">
                     <div class="col-md-4">
-                        <div class="metode-card" data-metode="va" onclick="pilihMetode('va', this)">
+                        <div class="metode-card" data-metode="va" onclick="pilihMetode('va', this)" role="radio" aria-checked="false" tabindex="0">
                             <div class="metode-icon text-primary"><i class="bi bi-bank"></i></div>
                             <div class="fw-semibold small">Virtual Account</div>
                             <small class="text-muted">Transfer via ATM</small>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="metode-card" data-metode="qris" onclick="pilihMetode('qris', this)">
+                        <div class="metode-card" data-metode="qris" onclick="pilihMetode('qris', this)" role="radio" aria-checked="false" tabindex="0">
                             <div class="metode-icon text-success"><i class="bi bi-qr-code"></i></div>
                             <div class="fw-semibold small">QRIS</div>
                             <small class="text-muted">Scan kode QR</small>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="metode-card" data-metode="teller" onclick="pilihMetode('teller', this)">
+                        <div class="metode-card" data-metode="teller" onclick="pilihMetode('teller', this)" role="radio" aria-checked="false" tabindex="0">
                             <div class="metode-icon text-warning"><i class="bi bi-shop"></i></div>
                             <div class="fw-semibold small">Teller / Kasir</div>
                             <small class="text-muted">Bayar langsung</small>
@@ -208,7 +221,6 @@ function lanjutPembayaran() {
             </div>
         </div>
 
-        <!-- Ringkasan -->
         <div class="card card-custom" id="ringkasanSPP">
             <div class="card-body">
                 <h6 class="fw-bold mb-3">Ringkasan Pembayaran</h6>
@@ -229,7 +241,6 @@ function lanjutPembayaran() {
         </div>
     </div>`;
 
-    // Scroll ke metode bayar
     document.getElementById('metodeSPPSection').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -240,37 +251,45 @@ function pilihMetode(metode, el) {
     document.getElementById('btnBayarSPP').disabled = false;
 
     const detailDiv = document.getElementById('metodeDetail');
+    const total = cicilanDipilih.reduce((sum, c) => sum + c.jumlah, 0);
+    detailDiv.innerHTML = '';
 
     if (metode === 'va') {
-        const va = generateVA();
+        const vaData = generateVA();
         detailDiv.innerHTML = `
-            <div class="text-center p-3 bg-light rounded-3">
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
                 <i class="bi bi-bank fs-3 text-primary"></i>
-                <p class="fw-bold mb-1 mt-2">Virtual Account</p>
-                <p class="fs-5 text-primary fw-bold mb-2">${va}</p>
-                <small class="text-muted">a.n SeumpamaBayar - Bank BNI</small><br>
-                <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${va}')">
+                <p class="fw-bold mb-1 mt-2">Virtual Account - ${vaData.bank}</p>
+                <p class="fs-5 text-primary fw-bold mb-2">${vaData.number}</p>
+                <small class="text-muted">a.n SeumpamaBayar</small><br>
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${vaData.number}')">
                     <i class="bi bi-copy me-1"></i>Salin VA
                 </button>
+                <div class="mt-2">
+                    <small class="text-muted">Ganti bank:</small><br>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('BCA')">BCA</button>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('BNI')">BNI</button>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('Mandiri')">Mandiri</button>
+                </div>
             </div>`;
     } else if (metode === 'qris') {
+        const qrText = 'SEUMPAMABAYAR-SPP-' + generateId('QR') + '-' + total;
         detailDiv.innerHTML = `
-            <div class="text-center p-3 bg-light rounded-3">
-                <i class="bi bi-qr-code fs-1 text-success"></i>
-                <p class="fw-bold mb-1 mt-2">QR Code</p>
-                <div class="bg-white d-inline-block p-3 rounded my-2 border">
-                    <div style="width:120px;height:120px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
-                        <i class="bi bi-qr-code fs-1 text-dark"></i>
-                    </div>
-                </div>
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
+                <p class="fw-bold mb-1">QR Code Pembayaran</p>
+                <div class="bg-white d-inline-block p-3 rounded my-2 border" id="qrcodeContainerSPP"></div>
                 <p class="small text-muted">Scan di e-wallet Anda</p>
-                <div class="text-danger small"><i class="bi bi-clock me-1"></i>Berlaku: <span id="countdown">05:00</span></div>
+                <div class="text-danger small"><i class="bi bi-clock me-1"></i>Berlaku: <span id="countdownSPP">05:00</span></div>
             </div>`;
-        startCountdown(300);
+        setTimeout(() => {
+            const qrContainer = document.getElementById('qrcodeContainerSPP');
+            if (qrContainer) generateQRCode('qrcodeContainerSPP', qrText);
+        }, 150);
+        startCountdown(300, 'countdownSPP');
     } else if (metode === 'teller') {
         const kode = generateKodeBayar();
         detailDiv.innerHTML = `
-            <div class="text-center p-3 bg-light rounded-3">
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
                 <i class="bi bi-shop fs-3 text-warning"></i>
                 <p class="fw-bold mb-1 mt-2">Kode Bayar</p>
                 <p class="fs-5 text-warning fw-bold mb-2">${kode}</p>
@@ -280,6 +299,28 @@ function pilihMetode(metode, el) {
                 </button>
             </div>`;
     }
+}
+
+// ✅ Fungsi gantiBank untuk SPP
+function gantiBankSPP(bank) {
+    const vaData = generateVA(bank);
+    const detailDiv = document.getElementById('metodeDetail');
+    detailDiv.innerHTML = `
+        <div class="text-center p-3 bg-light rounded-3 fade-in">
+            <i class="bi bi-bank fs-3 text-primary"></i>
+            <p class="fw-bold mb-1 mt-2">Virtual Account - ${vaData.bank}</p>
+            <p class="fs-5 text-primary fw-bold mb-2">${vaData.number}</p>
+            <small class="text-muted">a.n SeumpamaBayar</small><br>
+            <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${vaData.number}')">
+                <i class="bi bi-copy me-1"></i>Salin VA
+            </button>
+            <div class="mt-2">
+                <small class="text-muted">Ganti bank:</small><br>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('BCA')">BCA</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('BNI')">BNI</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankSPP('Mandiri')">Mandiri</button>
+            </div>
+        </div>`;
 }
 
 function konfirmasiBayarSPP() {
@@ -340,14 +381,12 @@ function prosesBayarSPP() {
             }
         };
 
-        // Simpan transaksi
         const riwayat = Storage.get('riwayat', []);
         riwayat.unshift(transaksi);
         Storage.set('riwayat', riwayat);
         saldo -= total;
         Storage.set('saldo', saldo);
 
-        // Update status cicilan
         const sppList = Storage.get('sppData', sppData);
         const mhs = sppList.find(m => m.nim === mhsAktif.nim);
         if (mhs) {
@@ -379,43 +418,80 @@ function prosesBayarSPP() {
     }, 2000);
 }
 
+// ✅ CETAK STRUK — Pilihan Print & PDF
 function cetakStrukSPP(id) {
     const transaksi = Storage.get('riwayat', []).find(t => t.id === id);
-    if (!transaksi) return;
+    if (!transaksi) {
+        showToast('Transaksi tidak ditemukan', 'error');
+        return;
+    }
 
-    const win = window.open('', '_blank', 'width=400,height=500');
-    win.document.write(`
-        <html><head><title>Struk SPP - ${id}</title>
-        <style>body{font-family:monospace;padding:20px;}h4{margin:0;}hr{border:1px dashed #ccc;}
-        .text-right{text-align:right;}</style></head>
-        <body>
-            <h4>SeumpamaBayar</h4><p>Struk Pembayaran SPP</p><hr>
-            <p>ID: ${transaksi.id}</p>
-            <p>Tanggal: ${formatTanggal(transaksi.tanggal)} ${formatJam(transaksi.tanggal)}</p>
-            <p>NIM: ${transaksi.detailSPP.nim}</p>
-            <p>Jumlah Cicilan: ${transaksi.detailSPP.cicilan.length}</p>
-            <p>Metode: ${transaksi.metode}</p><hr>
-            <h4 class="text-right">Total: ${formatRupiah(transaksi.total)}</h4><hr>
-            <p style="text-align:center;">Terima kasih</p>
-        </body></html>
-    `);
-    win.document.close();
-    win.print();
-}
+    const modalPilihan = document.createElement('div');
+    modalPilihan.innerHTML = `
+        <div class="modal fade" id="modalPilihanCetakSPP" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title fw-bold">Cetak Struk</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="small text-muted mb-3">Pilih metode cetak struk</p>
+                        <button class="btn btn-outline-primary w-100 mb-2" id="btnPrintStrukSPP">
+                            <i class="bi bi-printer me-2"></i>Print Struk
+                        </button>
+                        <button class="btn btn-outline-success w-100" id="btnPDFStrukSPP">
+                            <i class="bi bi-file-pdf me-2"></i>Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
 
-// Init theme
-initTheme();
-updateThemeIcon();
+    document.body.appendChild(modalPilihan);
+    const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetakSPP'));
+    modal.show();
 
-function toggleThemeButton() {
-    const theme = toggleTheme();
-    updateThemeIcon();
-    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
-}
+    document.getElementById('btnPrintStrukSPP').onclick = function () {
+        modal.hide();
+        const win = window.open('', '_blank', 'width=400,height=500');
+        win.document.write(`
+            <html><head><title>Struk SPP - ${id}</title>
+            <style>body{font-family:monospace;padding:20px;}h4{margin:0;text-align:center;}hr{border:1px dashed #ccc;}.text-right{text-align:right;}.text-center{text-align:center;}</style></head>
+            <body>
+                <h4>🌱 SeumpamaBayar</h4><p class="text-center">Struk Pembayaran SPP</p><hr>
+                <p>ID: ${transaksi.id}</p>
+                <p>Tanggal: ${formatTanggal(transaksi.tanggal)} ${formatJam(transaksi.tanggal)}</p>
+                <p>NIM: ${transaksi.detailSPP?.nim || '-'}</p>
+                <p>Jumlah Cicilan: ${transaksi.detailSPP?.cicilan?.length || 0}</p>
+                <p>Metode: ${transaksi.metode}</p><hr>
+                <h4 class="text-right">Total: ${formatRupiah(transaksi.total)}</h4><hr>
+                <p class="text-center">Terima kasih</p>
+            </body></html>
+        `);
+        win.document.close();
+        win.print();
+        cleanup();
+    };
 
-function updateThemeIcon() {
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+    document.getElementById('btnPDFStrukSPP').onclick = function () {
+        modal.hide();
+        if (typeof exportPDF === 'function') {
+            exportPDF(transaksi);
+            showToast('PDF berhasil diunduh', 'success');
+        } else {
+            showToast('Fitur PDF tidak tersedia', 'error');
+        }
+        cleanup();
+    };
+
+    function cleanup() {
+        setTimeout(() => {
+            if (document.body.contains(modalPilihan)) {
+                document.body.removeChild(modalPilihan);
+            }
+        }, 500);
+    }
+
+    document.getElementById('modalPilihanCetakSPP').addEventListener('hidden.bs.modal', cleanup);
 }

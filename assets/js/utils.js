@@ -73,10 +73,11 @@ function showToast(message, type = 'info') {
     const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
 
     const toastHTML = `
-        <div class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+        <div class="toast align-items-center text-white ${bgClass} border-0" 
+             role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
-                <div class="toast-body"><i class="bi bi-${icon} me-2"></i>${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                <div class="toast-body"><i class="bi bi-${icon} me-2" aria-hidden="true"></i>${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Tutup notifikasi"></button>
             </div>
         </div>`;
     container.innerHTML += toastHTML;

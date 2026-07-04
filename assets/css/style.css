@@ -185,13 +185,8 @@
   color: #fca5a5;
 }
 
-[data-theme="dark"] .bg-light {
-  background: #283548 !important;
-}
-
-[data-theme="dark"] .text-muted {
-  color: #94a3b8 !important;
-}
+/* ✅ Dihapus: .bg-light & .text-muted dipaksa */
+/* Biarkan Bootstrap handle dengan variabel */
 
 [data-theme="dark"] .progress {
   background: #334155;
@@ -217,6 +212,27 @@
 
 [data-theme="dark"] .dropdown-divider {
   border-color: #334155;
+}
+
+/* ✅ Tambahan: input-group-text di dark mode */
+[data-theme="dark"] .input-group-text {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+/* ✅ Tambahan: nav-pills di dark mode */
+[data-theme="dark"] .nav-pills .nav-link.active {
+  background: #4ade80;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .nav-pills .nav-link {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .nav-pills .nav-link:hover {
+  color: #e2e8f0;
 }
 
 /* ==================== BASE ==================== */
@@ -391,7 +407,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 107, 44, 0.2);
 }
 
-/* Topbar buttons hover */
 .topbar .btn {
   transition: all 0.25s ease;
 }
@@ -1049,6 +1064,21 @@ body {
 
 .app-footer a:hover::after {
   width: 100%;
+}
+
+/* ==================== FAQ ==================== */
+.cursor-pointer {
+  cursor: pointer;
+}
+.transition-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+.faq-answer {
+  border-top: 1px solid #e8ecf0;
+}
+[data-theme="dark"] .faq-answer {
+  border-color: #334155;
 }
 
 /* ==================== RESPONSIVE ==================== */

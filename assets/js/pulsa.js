@@ -2,7 +2,7 @@
 
 let currentProvider = null;
 let currentNomor = '';
-let currentJenis = 'pulsa'; // 'pulsa' atau 'paket'
+let currentJenis = 'pulsa';
 let selectedItem = null;
 let selectedHarga = 0;
 let selectedMetode = null;
@@ -12,7 +12,23 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('nomorHP').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') deteksiOtomatis();
     });
+
+    initTheme();
+    updateThemeIcon();
 });
+
+function toggleThemeButton() {
+    const theme = toggleTheme();
+    updateThemeIcon();
+    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+}
+
+function updateThemeIcon() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+}
 
 function deteksiOtomatis() {
     const nomor = document.getElementById('nomorHP').value.replace(/\D/g, '');
@@ -22,7 +38,7 @@ function deteksiOtomatis() {
     const pilihanSection = document.getElementById('pilihanSection');
 
     errorEl.textContent = '';
-    inputEl.classList.remove('is-invalid');
+    inputEl.classList.remove('is-invalid', 'is-valid');
     providerInfo.style.display = 'none';
     pilihanSection.style.display = 'none';
     currentProvider = null;
@@ -31,7 +47,6 @@ function deteksiOtomatis() {
     selectedHarga = 0;
     selectedMetode = null;
 
-    // Reset preview & metode
     document.getElementById('previewCard').style.display = 'none';
     document.getElementById('metodeCard').style.display = 'none';
     document.getElementById('btnBayarPulsa').disabled = true;
@@ -53,26 +68,18 @@ function deteksiOtomatis() {
         return;
     }
 
-    // Tampilkan provider
+    // ✅ Hapus validasi panjang di bawah — sudah ditangani validasiNomorHP
+
     providerInfo.style.display = 'block';
     document.getElementById('providerName').textContent = currentProvider;
     inputEl.classList.add('is-valid');
 
-    // Render pilihan
     renderPilihan();
     pilihanSection.style.display = 'block';
     pilihanSection.scrollIntoView({ behavior: 'smooth' });
-
-    // Validasi nomor HP lebih ketat
-    if (nomor.length < 10) {
-        inputEl.classList.add('is-invalid');
-        errorEl.textContent = 'Nomor HP terlalu pendek (min 10 digit)';
-        return;
-    }
 }
 
 function renderPilihan() {
-    // Render nominal pulsa
     const nominalContainer = document.getElementById('nominalContainer');
     nominalContainer.innerHTML = nominalPulsa.map(n => `
         <div class="col-4 col-md-3">
@@ -83,7 +90,6 @@ function renderPilihan() {
         </div>
     `).join('');
 
-    // Render paket data
     const paketContainer = document.getElementById('paketContainer');
     const paketList = paketData[currentProvider] || [];
 
@@ -100,7 +106,6 @@ function renderPilihan() {
                     <small class="text-primary">${formatRupiah(p.harga)}</small>
                 </div>
             </div>
-        </div>
         `).join('');
     }
 }
@@ -111,7 +116,6 @@ function pilihJenis(jenis) {
     selectedHarga = 0;
     selectedMetode = null;
 
-    // Reset semua pilihan
     document.querySelectorAll('#nominalContainer .kategori-card, #paketContainer .kategori-card')
         .forEach(c => c.classList.remove('active'));
 
@@ -119,13 +123,11 @@ function pilihJenis(jenis) {
     document.getElementById('metodeCard').style.display = 'none';
     document.getElementById('btnBayarPulsa').disabled = true;
 
-    // Reset metode
     document.querySelectorAll('#metodeCard .metode-card').forEach(c => c.classList.remove('selected'));
     document.getElementById('metodeDetail').innerHTML = '';
 }
 
 function pilihItem(jenis, nama, harga, el) {
-    // Reset semua pilihan di tab aktif
     const container = jenis === 'pulsa' ? '#nominalContainer' : '#paketContainer';
     document.querySelectorAll(container + ' .kategori-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
@@ -134,7 +136,6 @@ function pilihItem(jenis, nama, harga, el) {
     selectedHarga = harga;
     currentJenis = jenis;
 
-    // Tampilkan preview
     document.getElementById('previewCard').style.display = 'block';
     document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth' });
     document.getElementById('previewContent').innerHTML = `
@@ -151,7 +152,6 @@ function pilihItem(jenis, nama, harga, el) {
             </div>
         </div>`;
 
-    // Tampilkan metode bayar
     document.getElementById('metodeCard').style.display = 'block';
     document.getElementById('metodeCard').scrollIntoView({ behavior: 'smooth' });
     document.getElementById('btnBayarPulsa').disabled = true;
@@ -167,38 +167,45 @@ function pilihMetode(metode, el) {
     document.getElementById('btnBayarPulsa').disabled = false;
 
     const detailDiv = document.getElementById('metodeDetail');
+    detailDiv.innerHTML = '';
 
     if (metode === 'va') {
-        const va = generateVA();
+        // ✅ Pakai format baru
+        const vaData = generateVA();
         detailDiv.innerHTML = `
-            <div class="text-center p-3 bg-light rounded-3">
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
                 <i class="bi bi-bank fs-3 text-primary"></i>
-                <p class="fw-bold mb-1 mt-2">Virtual Account</p>
-                <p class="fs-5 text-primary fw-bold mb-2">${va}</p>
+                <p class="fw-bold mb-1 mt-2">Virtual Account - ${vaData.bank}</p>
+                <p class="fs-5 text-primary fw-bold mb-2">${vaData.number}</p>
                 <small class="text-muted">a.n SeumpamaBayar</small><br>
-                <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${va}')">
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${vaData.number}')">
                     <i class="bi bi-copy me-1"></i>Salin VA
                 </button>
+                <div class="mt-2">
+                    <small class="text-muted">Ganti bank:</small><br>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('BCA')">BCA</button>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('BNI')">BNI</button>
+                    <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('Mandiri')">Mandiri</button>
+                </div>
             </div>`;
     } else if (metode === 'qris') {
         const qrText = 'SEUMPAMABAYAR-PULSA-' + generateId('QR') + '-' + selectedHarga;
         detailDiv.innerHTML = `
-        <div class="text-center p-3 bg-light rounded-3">
-            <p class="fw-bold mb-1">QR Code Pembayaran</p>
-            <div class="bg-white d-inline-block p-3 rounded my-2 border" id="qrcodeContainerPulsa"></div>
-            <p class="small text-muted">Scan di e-wallet Anda</p>
-            <div class="text-danger small"><i class="bi bi-clock me-1"></i>Berlaku: <span id="countdown">05:00</span></div>
-        </div>`;
-
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
+                <p class="fw-bold mb-1">QR Code Pembayaran</p>
+                <div class="bg-white d-inline-block p-3 rounded my-2 border" id="qrcodeContainerPulsa"></div>
+                <p class="small text-muted">Scan di e-wallet Anda</p>
+                <div class="text-danger small"><i class="bi bi-clock me-1"></i>Berlaku: <span id="countdownPulsa">05:00</span></div>
+            </div>`;
         setTimeout(() => {
-            generateQRCode('qrcodeContainerPulsa', qrText);
-        }, 100);
-
-        startCountdown(300);
+            const qrContainer = document.getElementById('qrcodeContainerPulsa');
+            if (qrContainer) generateQRCode('qrcodeContainerPulsa', qrText);
+        }, 150);
+        startCountdown(300, 'countdownPulsa');
     } else if (metode === 'teller') {
         const kode = generateKodeBayar();
         detailDiv.innerHTML = `
-            <div class="text-center p-3 bg-light rounded-3">
+            <div class="text-center p-3 bg-light rounded-3 fade-in">
                 <i class="bi bi-shop fs-3 text-warning"></i>
                 <p class="fw-bold mb-1 mt-2">Kode Bayar</p>
                 <p class="fs-5 text-warning fw-bold mb-2">${kode}</p>
@@ -208,6 +215,28 @@ function pilihMetode(metode, el) {
                 </button>
             </div>`;
     }
+}
+
+// ✅ Fungsi gantiBank untuk Pulsa
+function gantiBankPulsa(bank) {
+    const vaData = generateVA(bank);
+    const detailDiv = document.getElementById('metodeDetail');
+    detailDiv.innerHTML = `
+        <div class="text-center p-3 bg-light rounded-3 fade-in">
+            <i class="bi bi-bank fs-3 text-primary"></i>
+            <p class="fw-bold mb-1 mt-2">Virtual Account - ${vaData.bank}</p>
+            <p class="fs-5 text-primary fw-bold mb-2">${vaData.number}</p>
+            <small class="text-muted">a.n SeumpamaBayar</small><br>
+            <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyText('${vaData.number}')">
+                <i class="bi bi-copy me-1"></i>Salin VA
+            </button>
+            <div class="mt-2">
+                <small class="text-muted">Ganti bank:</small><br>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('BCA')">BCA</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('BNI')">BNI</button>
+                <button class="btn btn-outline-secondary btn-sm mt-1" onclick="gantiBankPulsa('Mandiri')">Mandiri</button>
+            </div>
+        </div>`;
 }
 
 function konfirmasiBayarPulsa() {
@@ -266,7 +295,6 @@ function prosesBayarPulsa() {
             }
         };
 
-        // Simpan ke storage
         const riwayat = Storage.get('riwayat', []);
         riwayat.unshift(transaksi);
         Storage.set('riwayat', riwayat);
@@ -293,7 +321,7 @@ function prosesBayarPulsa() {
 }
 
 function maskNomor(nomor) {
-    if (nomor.length <= 4) return nomor;
+    if (!nomor || nomor.length <= 4) return nomor || '-';
     return nomor.substring(0, 4) + '-****-' + nomor.substring(nomor.length - 4);
 }
 
@@ -306,7 +334,7 @@ function cetakStrukPulsa(id) {
 
     const modalPilihan = document.createElement('div');
     modalPilihan.innerHTML = `
-        <div class="modal fade" id="modalPilihanCetak" tabindex="-1">
+        <div class="modal fade" id="modalPilihanCetakPulsa" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -315,10 +343,10 @@ function cetakStrukPulsa(id) {
                     </div>
                     <div class="modal-body text-center">
                         <p class="small text-muted mb-3">Pilih metode cetak struk</p>
-                        <button class="btn btn-outline-primary w-100 mb-2" id="btnPrintStruk">
+                        <button class="btn btn-outline-primary w-100 mb-2" id="btnPrintStrukPulsa">
                             <i class="bi bi-printer me-2"></i>Print Struk
                         </button>
-                        <button class="btn btn-outline-success w-100" id="btnPDFStruk">
+                        <button class="btn btn-outline-success w-100" id="btnPDFStrukPulsa">
                             <i class="bi bi-file-pdf me-2"></i>Download PDF
                         </button>
                     </div>
@@ -327,18 +355,18 @@ function cetakStrukPulsa(id) {
         </div>`;
 
     document.body.appendChild(modalPilihan);
-    const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetak'));
+    const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetakPulsa'));
     modal.show();
 
-    document.getElementById('btnPrintStruk').onclick = function () {
+    document.getElementById('btnPrintStrukPulsa').onclick = function () {
         modal.hide();
         const win = window.open('', '_blank', 'width=400,height=500');
         win.document.write(`
+            <!DOCTYPE html>
             <html><head><title>Struk - ${transaksi.id}</title>
-            <style>body{font-family:monospace;padding:20px;}h4{margin:0;}hr{border:1px dashed #ccc;}
-            .text-right{text-align:right;}.text-center{text-align:center;}</style></head>
+            <style>body{font-family:monospace;padding:20px;}h4{margin:0;}hr{border:1px dashed #ccc;}.text-right{text-align:right;}.text-center{text-align:center;}</style></head>
             <body>
-                <h4 class="text-center">SeumpamaBayar</h4><p class="text-center">Struk Pembelian</p><hr>
+                <h4 class="text-center">🌱 SeumpamaBayar</h4><p class="text-center">Struk Pembelian</p><hr>
                 <p>ID: ${transaksi.id}</p>
                 <p>Tanggal: ${formatTanggal(transaksi.tanggal)} ${formatJam(transaksi.tanggal)}</p>
                 <p>Provider: ${transaksi.detailPulsa?.provider || '-'}</p>
@@ -351,40 +379,32 @@ function cetakStrukPulsa(id) {
         `);
         win.document.close();
         win.print();
-        setTimeout(() => document.body.removeChild(modalPilihan), 500);
+        cleanup();
     };
 
-    document.getElementById('btnPDFStruk').onclick = function () {
+    document.getElementById('btnPDFStrukPulsa').onclick = function () {
         modal.hide();
-        exportPDF(transaksi);
-        showToast('PDF berhasil diunduh', 'success');
-        setTimeout(() => document.body.removeChild(modalPilihan), 500);
+        if (typeof exportPDF === 'function') {
+            exportPDF(transaksi);
+            showToast('PDF berhasil diunduh', 'success');
+        } else {
+            showToast('Fitur PDF tidak tersedia', 'error');
+        }
+        cleanup();
     };
 
-    document.getElementById('modalPilihanCetak').addEventListener('hidden.bs.modal', function () {
-        document.body.removeChild(modalPilihan);
-    });
-}
+    function cleanup() {
+        setTimeout(() => {
+            if (document.body.contains(modalPilihan)) {
+                document.body.removeChild(modalPilihan);
+            }
+        }, 500);
+    }
 
-// Init theme
-initTheme();
-updateThemeIcon();
-
-function toggleThemeButton() {
-    const theme = toggleTheme();
-    updateThemeIcon();
-    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
-}
-
-function updateThemeIcon() {
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+    document.getElementById('modalPilihanCetakPulsa').addEventListener('hidden.bs.modal', cleanup);
 }
 
 function showCustomInput() {
-    // Reset pilihan
     document.querySelectorAll('#nominalContainer .kategori-card, #paketContainer .kategori-card')
         .forEach(c => c.classList.remove('active'));
 
@@ -438,7 +458,6 @@ function submitCustomNominal() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('modalCustomNominal'));
     modal.hide();
 
-    // Pilih item custom
     const customCard = document.querySelector('[data-nominal="custom"]');
     pilihItem('pulsa', `Pulsa ${formatRupiah(nominal)}`, nominal, customCard);
 }

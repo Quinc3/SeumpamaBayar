@@ -4,7 +4,22 @@ let currentDetailId = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     renderRiwayat();
+    initTheme();
+    updateThemeIcon();
 });
+
+function toggleThemeButton() {
+    const theme = toggleTheme();
+    updateThemeIcon();
+    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+}
+
+function updateThemeIcon() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+}
 
 function getRiwayatFiltered() {
     let riwayat = Storage.get('riwayat', []);
@@ -16,17 +31,14 @@ function getRiwayatFiltered() {
     const searchText = document.getElementById('searchTransaksi')?.value.toLowerCase() || '';
     const sortOrder = document.getElementById('sortOrder')?.value || 'terbaru';
 
-    // Filter jenis
     if (filterJenis) {
         riwayat = riwayat.filter(t => t.jenis === filterJenis);
     }
 
-    // Filter status
     if (filterStatus) {
         riwayat = riwayat.filter(t => t.status === filterStatus);
     }
 
-    // Filter tanggal
     if (filterDari) {
         riwayat = riwayat.filter(t => new Date(t.tanggal) >= new Date(filterDari));
     }
@@ -36,7 +48,6 @@ function getRiwayatFiltered() {
         riwayat = riwayat.filter(t => new Date(t.tanggal) <= sampai);
     }
 
-    // Search
     if (searchText) {
         riwayat = riwayat.filter(t =>
             t.id.toLowerCase().includes(searchText) ||
@@ -46,7 +57,6 @@ function getRiwayatFiltered() {
         );
     }
 
-    // Sort
     switch (sortOrder) {
         case 'terlama':
             riwayat.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
@@ -64,6 +74,7 @@ function getRiwayatFiltered() {
     return riwayat;
 }
 
+// ✅ Hanya SATU fungsi resetFilter (hapus duplikat)
 function resetFilter() {
     document.getElementById('filterJenis').value = '';
     document.getElementById('filterStatus').value = '';
@@ -81,17 +92,16 @@ function renderRiwayat() {
     const emptyEl = document.getElementById('emptyState');
     const totalEl = document.getElementById('totalTransaksi');
 
-    totalEl.textContent = `${riwayat.length} transaksi tercatat`;
+    if (totalEl) totalEl.textContent = `${riwayat.length} transaksi tercatat`;
 
     if (riwayat.length === 0) {
-        listEl.innerHTML = '';
-        emptyEl.style.display = 'block';
+        if (listEl) listEl.innerHTML = '';
+        if (emptyEl) emptyEl.style.display = 'block';
         return;
     }
 
-    emptyEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
 
-    // Group by date
     const grouped = {};
     riwayat.forEach(t => {
         const dateKey = formatTanggal(t.tanggal, false);
@@ -115,11 +125,12 @@ function renderRiwayat() {
         <div class="mb-3">
             <small class="text-muted fw-semibold d-block mb-2">📅 ${date}</small>
             ${items.map(t => `
-            <div class="list-group-item d-flex justify-content-between align-items-center mb-1 cursor-pointer" 
-                 onclick="showDetail('${t.id}')" style="cursor:pointer;">
+            <div class="list-group-item d-flex justify-content-between align-items-center mb-1" 
+                 onclick="showDetail('${t.id}')" style="cursor:pointer;" role="button" tabindex="0"
+                 aria-label="Lihat detail transaksi ${t.id}">
                 <div class="d-flex align-items-center gap-3">
                     <div class="fs-5 ${iconMap[t.jenis] || 'bi-receipt text-muted'}">
-                        <i class="bi ${iconMap[t.jenis]?.split(' ')[0] || 'bi-receipt'}"></i>
+                        <i class="bi ${(iconMap[t.jenis] || 'bi-receipt').split(' ')[0]}"></i>
                     </div>
                     <div>
                         <div class="fw-medium small">${t.deskripsi}</div>
@@ -142,20 +153,11 @@ function renderRiwayat() {
         </div>`;
     }
 
-    listEl.innerHTML = html;
+    if (listEl) listEl.innerHTML = html;
 }
 
 function filterRiwayat() {
     renderRiwayat();
-}
-
-function resetFilter() {
-    document.getElementById('filterJenis').value = '';
-    document.getElementById('filterStatus').value = '';
-    document.getElementById('sortOrder').value = 'terbaru';
-    document.getElementById('searchTransaksi').value = '';
-    renderRiwayat();
-    showToast('Filter direset', 'info');
 }
 
 function showDetail(id) {
@@ -250,7 +252,7 @@ function exportRiwayat() {
 function cetakStruk(transaksi) {
     const modalPilihan = document.createElement('div');
     modalPilihan.innerHTML = `
-        <div class="modal fade" id="modalPilihanCetak" tabindex="-1">
+        <div class="modal fade" id="modalPilihanCetakRiwayat" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -259,10 +261,10 @@ function cetakStruk(transaksi) {
                     </div>
                     <div class="modal-body text-center">
                         <p class="small text-muted mb-3">Pilih metode cetak struk</p>
-                        <button class="btn btn-outline-primary w-100 mb-2" id="btnPrintStruk">
+                        <button class="btn btn-outline-primary w-100 mb-2" id="btnPrintStrukRiwayat">
                             <i class="bi bi-printer me-2"></i>Print Struk
                         </button>
-                        <button class="btn btn-outline-success w-100" id="btnPDFStruk">
+                        <button class="btn btn-outline-success w-100" id="btnPDFStrukRiwayat">
                             <i class="bi bi-file-pdf me-2"></i>Download PDF
                         </button>
                     </div>
@@ -271,18 +273,18 @@ function cetakStruk(transaksi) {
         </div>`;
 
     document.body.appendChild(modalPilihan);
-    const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetak'));
+    const modal = new bootstrap.Modal(document.getElementById('modalPilihanCetakRiwayat'));
     modal.show();
 
-    document.getElementById('btnPrintStruk').onclick = function () {
+    document.getElementById('btnPrintStrukRiwayat').onclick = function () {
         modal.hide();
         const win = window.open('', '_blank', 'width=400,height=500');
         win.document.write(`
+            <!DOCTYPE html>
             <html><head><title>Struk - ${transaksi.id}</title>
-            <style>body{font-family:monospace;padding:20px;}h4{margin:0;}hr{border:1px dashed #ccc;}
-            .text-right{text-align:right;}.text-center{text-align:center;}</style></head>
+            <style>body{font-family:monospace;padding:20px;}h4{margin:0;}hr{border:1px dashed #ccc;}.text-right{text-align:right;}.text-center{text-align:center;}</style></head>
             <body>
-                <h4 class="text-center">SeumpamaBayar</h4><p class="text-center">Struk Transaksi</p><hr>
+                <h4 class="text-center">🌱 SeumpamaBayar</h4><p class="text-center">Struk Transaksi</p><hr>
                 <p>ID: ${transaksi.id}</p>
                 <p>Tanggal: ${formatTanggal(transaksi.tanggal)} ${formatJam(transaksi.tanggal)}</p>
                 <p>Jenis: ${transaksi.jenis}</p>
@@ -294,39 +296,32 @@ function cetakStruk(transaksi) {
         `);
         win.document.close();
         win.print();
-        setTimeout(() => document.body.removeChild(modalPilihan), 500);
+        cleanup();
     };
 
-    document.getElementById('btnPDFStruk').onclick = function () {
+    document.getElementById('btnPDFStrukRiwayat').onclick = function () {
         modal.hide();
-        exportPDF(transaksi);
-        showToast('PDF berhasil diunduh', 'success');
-        setTimeout(() => document.body.removeChild(modalPilihan), 500);
+        if (typeof exportPDF === 'function') {
+            exportPDF(transaksi);
+            showToast('PDF berhasil diunduh', 'success');
+        } else {
+            showToast('Fitur PDF tidak tersedia', 'error');
+        }
+        cleanup();
     };
 
-    document.getElementById('modalPilihanCetak').addEventListener('hidden.bs.modal', function () {
-        document.body.removeChild(modalPilihan);
-    });
+    function cleanup() {
+        setTimeout(() => {
+            if (document.body.contains(modalPilihan)) {
+                document.body.removeChild(modalPilihan);
+            }
+        }, 500);
+    }
+
+    document.getElementById('modalPilihanCetakRiwayat').addEventListener('hidden.bs.modal', cleanup);
 }
 
 function maskNomor(nomor) {
     if (!nomor || nomor.length <= 4) return nomor || '-';
     return nomor.substring(0, 4) + '-****-' + nomor.substring(nomor.length - 4);
-}
-
-// Init theme
-initTheme();
-updateThemeIcon();
-
-function toggleThemeButton() {
-    const theme = toggleTheme();
-    updateThemeIcon();
-    showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
-}
-
-function updateThemeIcon() {
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
 }
