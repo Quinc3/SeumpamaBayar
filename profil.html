@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeumpamaBayar - Profil</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- QRCode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar" role="navigation" aria-label="Sidebar navigasi">
+        <div class="sidebar-brand">🌱 SeumpamaBayar</div>
+        <nav class="nav flex-column flex-grow-1" role="navigation" aria-label="Navigasi utama">
+            <a href="index.html" class="nav-link">
+                <i class="bi bi-grid me-2" aria-hidden="true"></i> Dashboard
+            </a>
+            <a href="bayar-tagihan.html" class="nav-link">
+                <i class="bi bi-receipt me-2" aria-hidden="true"></i> Bayar Tagihan
+            </a>
+            <a href="spp.html" class="nav-link">
+                <i class="bi bi-mortarboard me-2" aria-hidden="true"></i> Biaya Kuliah
+            </a>
+            <a href="pulsa.html" class="nav-link">
+                <i class="bi bi-phone me-2" aria-hidden="true"></i> Isi Pulsa
+            </a>
+            <a href="riwayat.html" class="nav-link">
+                <i class="bi bi-clock-history me-2" aria-hidden="true"></i> Riwayat
+            </a>
+            <a href="profil.html" class="nav-link active" aria-current="page">
+                <i class="bi bi-person me-2" aria-hidden="true"></i> Profil
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="faq.html" class="btn btn-outline-secondary btn-sm w-100 rounded-pill">
+                <i class="bi bi-question-circle me-1" aria-hidden="true"></i> Bantuan
+            </a>
+        </div>
+    </aside>
+
+<header class="topbar" role="banner">
+    <div class="search-box">
+        <i class="bi bi-search text-muted" aria-hidden="true"></i>
+        <input type="text" placeholder="Cari..." aria-label="Cari layanan atau transaksi">
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light btn-sm rounded-pill position-relative" aria-label="Notifikasi">
+            <i class="bi bi-bell" aria-hidden="true"></i>
+            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger rounded-circle"
+                style="width:8px;height:8px;" aria-hidden="true"></span>
+        </button>
+        <button class="btn btn-light btn-sm rounded-pill me-2" onclick="toggleThemeButton()" id="themeToggle"
+            aria-label="Ganti tema gelap terang">
+            <i class="bi bi-moon-stars" aria-hidden="true"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2">
+            <div class="text-end d-none d-sm-block">
+                <div class="fw-semibold small" id="profilName">Budi Darmawan</div>
+                <small class="text-muted" style="font-size:0.7rem;">Premium</small>
+            </div>
+            <div class="avatar" id="profilAvatar" aria-label="Avatar pengguna">B</div>
+        </div>
+    </div>
+</header>
+
+<main class="main-content" role="main" aria-label="Halaman profil pengguna">
+
+    <nav class="mb-3" style="font-size:0.8rem;" aria-label="Breadcrumb">
+        <a href="index.html" class="text-muted text-decoration-none">Dashboard</a>
+        <span class="text-muted mx-1" aria-hidden="true">/</span>
+        <span class="fw-medium">Profil</span>
+    </nav>
+
+    <h5 class="fw-bold mb-4">👤 Profil Pengguna</h5>
+
+    <div class="row g-4">
+        <!-- Foto & Nama -->
+        <div class="col-md-4">
+            <div class="card card-custom p-4 text-center">
+                <div class="avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;" id="fotoProfil" aria-label="Foto profil">B</div>
+                <h6 class="fw-bold" id="namaProfil">Budi Darmawan</h6>
+                <small class="text-muted" id="emailProfil">budi@email.com</small>
+                <button class="btn btn-outline-primary btn-sm mt-3 w-100" onclick="editProfil()" aria-label="Edit profil">
+                    <i class="bi bi-pencil me-1" aria-hidden="true"></i> Edit Profil
+                </button>
+            </div>
+        </div>
+
+        <!-- Detail -->
+        <div class="col-md-8">
+            <div class="card card-custom">
+                <div class="card-header fw-bold">Informasi Akun</div>
+                <div class="card-body">
+                    <div class="detail-row"><span class="label">Nama Lengkap</span><span class="value" id="detNama">Budi Darmawan</span></div>
+                    <div class="detail-row"><span class="label">Email</span><span class="value" id="detEmail">budi@email.com</span></div>
+                    <div class="detail-row"><span class="label">No. HP</span><span class="value" id="detHP">081234567890</span></div>
+                    <div class="detail-row"><span class="label">Member</span><span class="value"><span class="badge bg-success">Premium</span></span></div>
+                    <div class="detail-row"><span class="label">Bergabung</span><span class="value">1 Januari 2024</span></div>
+                </div>
+            </div>
+
+            <!-- Statistik Pribadi -->
+            <div class="card card-custom mt-4">
+                <div class="card-header fw-bold">Statistik Transaksi</div>
+                <div class="card-body">
+                    <div class="row g-3" id="statProfil" aria-live="polite">
+                        <!-- Render dinamis via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer class="app-footer" role="contentinfo">
+    <div>
+        <span class="fw-semibold small">🌱 SeumpamaBayar</span>
+        <span class="text-muted small ms-2">© 2024. All rights reserved.</span>
+    </div>
+    <div class="d-flex gap-3">
+        <a href="#" class="text-muted small text-decoration-none">Syarat & Ketentuan</a>
+        <a href="#" class="text-muted small text-decoration-none">Privasi</a>
+        <a href="#" class="text-muted small text-decoration-none">Kontak</a>
+    </div>
+</footer>
+
+<!-- Modal Edit Profil -->
+<div class="modal fade" id="modalEditProfil" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modalEditProfilTitle">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold" id="modalEditProfilTitle">Edit Profil</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editNama" class="form-label small fw-semibold">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="editNama" value="Budi Darmawan" aria-label="Nama lengkap">
+                </div>
+                <div class="mb-3">
+                    <label for="editEmail" class="form-label small fw-semibold">Email</label>
+                    <input type="email" class="form-control" id="editEmail" value="budi@email.com" aria-label="Alamat email">
+                </div>
+                <div class="mb-3">
+                    <label for="editHP" class="form-label small fw-semibold">No. HP</label>
+                    <input type="text" class="form-control" id="editHP" value="081234567890" aria-label="Nomor handphone">
+                </div>
+                <div class="mb-3">
+                    <label for="editInisial" class="form-label small fw-semibold">Foto Profil (inisial)</label>
+                    <input type="text" class="form-control" id="editInisial" maxlength="2" value="B" aria-label="Inisial foto profil">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="simpanProfil()" aria-label="Simpan perubahan profil">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script>
+    // Init
+    document.addEventListener('DOMContentLoaded', function() {
+        initTheme();
+        updateThemeIcon();
+        loadProfil();
+        loadStatProfil();
+    });
+
+    function toggleThemeButton() {
+        const theme = toggleTheme();
+        updateThemeIcon();
+        showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+    }
+
+    function updateThemeIcon() {
+        const btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.innerHTML = isDark ? '<i class="bi bi-sun" aria-hidden="true"></i>' : '<i class="bi bi-moon-stars" aria-hidden="true"></i>';
+    }
+
+    function loadProfil() {
+        const profil = Storage.get('profil', {
+            nama: 'Budi Darmawan',
+            email: 'budi@email.com',
+            hp: '081234567890',
+            inisial: 'B'
+        });
+
+        document.getElementById('namaProfil').textContent = profil.nama;
+        document.getElementById('emailProfil').textContent = profil.email;
+        document.getElementById('fotoProfil').textContent = profil.inisial;
+        document.getElementById('profilName').textContent = profil.nama;
+        document.getElementById('profilAvatar').textContent = profil.inisial;
+        document.getElementById('detNama').textContent = profil.nama;
+        document.getElementById('detEmail').textContent = profil.email;
+        document.getElementById('detHP').textContent = profil.hp;
+    }
+
+    function loadStatProfil() {
+        const riwayat = Storage.get('riwayat', []);
+        const total = riwayat.reduce((s, t) => s + t.total, 0);
+        const sukses = riwayat.filter(t => t.status === 'sukses').length;
+
+        document.getElementById('statProfil').innerHTML = `
+            <div class="col-4">
+                <div class="card-stat p-3 text-center">
+                    <h5 class="fw-bold text-primary">${riwayat.length}</h5>
+                    <small class="text-muted">Total Transaksi</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card-stat p-3 text-center">
+                    <h5 class="fw-bold text-success">${sukses}</h5>
+                    <small class="text-muted">Sukses</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card-stat p-3 text-center">
+                    <h5 class="fw-bold text-info">${formatRupiah(total)}</h5>
+                    <small class="text-muted">Total Pengeluaran</small>
+                </div>
+            </div>`;
+    }
+
+    function editProfil() {
+        const profil = Storage.get('profil', { nama: 'Budi Darmawan', email: 'budi@email.com', hp: '081234567890', inisial: 'B' });
+        document.getElementById('editNama').value = profil.nama;
+        document.getElementById('editEmail').value = profil.email;
+        document.getElementById('editHP').value = profil.hp;
+        document.getElementById('editInisial').value = profil.inisial;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalEditProfil'));
+        modal.show();
+    }
+
+    function simpanProfil() {
+        const profil = {
+            nama: document.getElementById('editNama').value.trim() || 'Budi Darmawan',
+            email: document.getElementById('editEmail').value.trim() || 'budi@email.com',
+            hp: document.getElementById('editHP').value.trim() || '081234567890',
+            inisial: document.getElementById('editInisial').value.trim().toUpperCase() || 'B'
+        };
+
+        Storage.set('profil', profil);
+        loadProfil();
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditProfil'));
+        modal.hide();
+
+        showToast('Profil berhasil disimpan', 'success');
+    }
+</script>
+
+</body>
+</html>

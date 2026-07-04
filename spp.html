@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeumpamaBayar - Biaya Kuliah</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- QRCode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" role="navigation" aria-label="Sidebar navigasi">
+        <div class="sidebar-brand">🌱 SeumpamaBayar</div>
+        <nav class="nav flex-column flex-grow-1" role="navigation" aria-label="Navigasi utama">
+            <a href="index.html" class="nav-link">
+                <i class="bi bi-grid me-2" aria-hidden="true"></i> Dashboard
+            </a>
+            <a href="bayar-tagihan.html" class="nav-link">
+                <i class="bi bi-receipt me-2" aria-hidden="true"></i> Bayar Tagihan
+            </a>
+            <a href="spp.html" class="nav-link active" aria-current="page">
+                <i class="bi bi-mortarboard me-2" aria-hidden="true"></i> Biaya Kuliah
+            </a>
+            <a href="pulsa.html" class="nav-link">
+                <i class="bi bi-phone me-2" aria-hidden="true"></i> Isi Pulsa
+            </a>
+            <a href="riwayat.html" class="nav-link">
+                <i class="bi bi-clock-history me-2" aria-hidden="true"></i> Riwayat
+            </a>
+            <a href="profil.html" class="nav-link">
+                <i class="bi bi-person me-2" aria-hidden="true"></i> Profil
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="faq.html" class="btn btn-outline-secondary btn-sm w-100 rounded-pill">
+                <i class="bi bi-question-circle me-1" aria-hidden="true"></i> Bantuan
+            </a>
+        </div>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar" role="banner">
+        <div class="search-box">
+            <i class="bi bi-search text-muted" aria-hidden="true"></i>
+            <input type="text" placeholder="Cari layanan..." aria-label="Cari layanan atau transaksi">
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-light btn-sm rounded-pill position-relative" aria-label="Notifikasi">
+                <i class="bi bi-bell" aria-hidden="true"></i>
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger rounded-circle"
+                    style="width:8px;height:8px;" aria-hidden="true"></span>
+            </button>
+            <button class="btn btn-light btn-sm rounded-pill me-2" onclick="toggleThemeButton()" id="themeToggle"
+                aria-label="Ganti tema gelap terang">
+                <i class="bi bi-moon-stars" aria-hidden="true"></i>
+            </button>
+            <div class="d-flex align-items-center gap-2">
+                <div class="text-end d-none d-sm-block">
+                    <div class="fw-semibold small" id="topbarName">Budi Darmawan</div>
+                    <small class="text-muted" style="font-size:0.7rem;">Premium</small>
+                </div>
+                <div class="avatar" id="topbarAvatar" aria-label="Avatar pengguna">B</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" role="main" aria-label="Halaman biaya kuliah SPP">
+
+        <nav class="mb-3" style="font-size:0.8rem;" aria-label="Breadcrumb">
+            <a href="index.html" class="text-muted text-decoration-none">Dashboard</a>
+            <span class="text-muted mx-1" aria-hidden="true">/</span>
+            <span class="fw-medium">Biaya Kuliah (SPP)</span>
+        </nav>
+
+        <h5 class="fw-bold mb-4">🎓 Biaya Kuliah / SPP</h5>
+
+        <!-- Input NIM -->
+        <div class="card card-custom mb-4">
+            <div class="card-header">
+                <i class="bi bi-search me-2" aria-hidden="true"></i> Cek Data Mahasiswa
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label for="nimInput" class="form-label fw-semibold small">Nomor Induk Mahasiswa (NIM)</label>
+                        <input type="text" class="form-control" id="nimInput"
+                            placeholder="Masukkan NIM (contoh: 2024001)"
+                            aria-label="Nomor Induk Mahasiswa"
+                            aria-describedby="nimError">
+                        <div class="invalid-feedback d-block" id="nimError" style="font-size:0.75rem;" role="alert"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100" onclick="cekSPP()" aria-label="Cek data SPP">
+                            <i class="bi bi-search me-1" aria-hidden="true"></i> Cek Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hasil Pencarian -->
+        <div id="hasilSPP" style="display:none;" aria-live="polite"></div>
+
+        <!-- Metode Bayar -->
+        <div id="metodeSPPSection" style="display:none;" aria-live="polite"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer" role="contentinfo">
+        <div>
+            <span class="fw-semibold small">🌱 SeumpamaBayar</span>
+            <span class="text-muted small ms-2">© 2024. All rights reserved.</span>
+        </div>
+        <div class="d-flex gap-3">
+            <a href="#" class="text-muted small text-decoration-none">Syarat & Ketentuan</a>
+            <a href="#" class="text-muted small text-decoration-none">Privasi</a>
+            <a href="#" class="text-muted small text-decoration-none">Kontak</a>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal fade" id="modalKonfirmasi" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modalKonfirmasiSPPTitle">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-bold" id="modalKonfirmasiSPPTitle">Konfirmasi Pembayaran</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" id="modalKonfirmasiBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btnKonfirmasiBayar">Bayar Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSukses" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modalSuksesSPPTitle">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title fw-bold visually-hidden" id="modalSuksesSPPTitle">Transaksi Berhasil</h6>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body pt-0" id="modalSuksesBody"></div>
+                <div class="modal-footer border-0 justify-content-center" id="modalSuksesFooter"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-label="Memproses">
+        <div class="loading-box">
+            <div class="spinner-border text-primary mb-3" role="img" aria-label="Loading spinner"></div>
+            <p class="fw-medium mb-0">Memproses pembayaran...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/spp.js"></script>
+
+</body>
+
+</html>

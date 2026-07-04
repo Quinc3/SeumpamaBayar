@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeumpamaBayar - Bantuan</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar" role="navigation" aria-label="Sidebar navigasi">
+    <div class="sidebar-brand">🌱 SeumpamaBayar</div>
+    <nav class="nav flex-column flex-grow-1" role="navigation" aria-label="Navigasi utama">
+        <a href="index.html" class="nav-link">
+            <i class="bi bi-grid me-2" aria-hidden="true"></i> Dashboard
+        </a>
+        <a href="bayar-tagihan.html" class="nav-link">
+            <i class="bi bi-receipt me-2" aria-hidden="true"></i> Bayar Tagihan
+        </a>
+        <a href="spp.html" class="nav-link">
+            <i class="bi bi-mortarboard me-2" aria-hidden="true"></i> Biaya Kuliah
+        </a>
+        <a href="pulsa.html" class="nav-link">
+            <i class="bi bi-phone me-2" aria-hidden="true"></i> Isi Pulsa
+        </a>
+        <a href="riwayat.html" class="nav-link">
+            <i class="bi bi-clock-history me-2" aria-hidden="true"></i> Riwayat
+        </a>
+        <a href="profil.html" class="nav-link">
+            <i class="bi bi-person me-2" aria-hidden="true"></i> Profil
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="faq.html" class="btn btn-outline-secondary btn-sm w-100 rounded-pill active" aria-current="page">
+            <i class="bi bi-question-circle me-1" aria-hidden="true"></i> Bantuan
+        </a>
+    </div>
+</aside>
+
+<header class="topbar" role="banner">
+    <div class="search-box">
+        <i class="bi bi-search text-muted" aria-hidden="true"></i>
+        <input type="text" placeholder="Cari..." aria-label="Cari pertanyaan FAQ">
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light btn-sm rounded-pill position-relative" aria-label="Notifikasi">
+            <i class="bi bi-bell" aria-hidden="true"></i>
+            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger rounded-circle"
+                style="width:8px;height:8px;" aria-hidden="true"></span>
+        </button>
+        <button class="btn btn-light btn-sm rounded-pill me-2" onclick="toggleThemeButton()" id="themeToggle"
+            aria-label="Ganti tema gelap terang">
+            <i class="bi bi-moon-stars" aria-hidden="true"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2">
+            <div class="text-end d-none d-sm-block">
+                <div class="fw-semibold small" id="topbarName">Budi Darmawan</div>
+                <small class="text-muted" style="font-size:0.7rem;">Premium</small>
+            </div>
+            <div class="avatar" id="topbarAvatar" aria-label="Avatar pengguna">B</div>
+        </div>
+    </div>
+</header>
+
+<main class="main-content" role="main" aria-label="Halaman bantuan dan FAQ">
+
+    <nav class="mb-3" style="font-size:0.8rem;" aria-label="Breadcrumb">
+        <a href="index.html" class="text-muted text-decoration-none">Dashboard</a>
+        <span class="text-muted mx-1" aria-hidden="true">/</span>
+        <span class="fw-medium">Bantuan</span>
+    </nav>
+
+    <h5 class="fw-bold mb-4">❓ Bantuan & FAQ</h5>
+
+    <!-- Pencarian FAQ -->
+    <div class="card card-custom mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <span class="input-group-text bg-white" aria-hidden="true"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchFAQ" 
+                       placeholder="Cari pertanyaan..." oninput="filterFAQ()"
+                       aria-label="Cari pertanyaan FAQ">
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar FAQ -->
+    <div id="faqList" role="list" aria-label="Daftar pertanyaan umum">
+        <div class="card card-custom mb-3 faq-item" data-keywords="saldo isi topup" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-wallet me-2 text-primary" aria-hidden="true"></i> Bagaimana cara mengisi saldo?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Untuk mengisi saldo:</p>
+                <ol>
+                    <li>Buka halaman <strong>Dashboard</strong></li>
+                    <li>Klik tombol <strong>"Isi Saldo"</strong> di kartu saldo</li>
+                    <li>Pilih nominal pengisian</li>
+                    <li>Pilih metode pembayaran</li>
+                    <li>Konfirmasi pembayaran</li>
+                </ol>
+                <small class="text-muted">Saldo akan bertambah setelah pembayaran berhasil.</small>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="tagihan bayar pln pdam internet seminar" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-receipt me-2 text-primary" aria-hidden="true"></i> Bagaimana cara membayar tagihan?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Untuk membayar tagihan:</p>
+                <ol>
+                    <li>Buka halaman <strong>Bayar Tagihan</strong></li>
+                    <li>Pilih kategori (PLN, PDAM, Internet, atau Seminar)</li>
+                    <li>Masukkan nomor pelanggan/ID</li>
+                    <li>Klik <strong>"Cek Tagihan"</strong></li>
+                    <li>Pilih metode pembayaran (VA, QRIS, atau Teller)</li>
+                    <li>Klik <strong>"Bayar Sekarang"</strong> dan konfirmasi</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="spp kuliah cicilan nim mahasiswa" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-mortarboard me-2 text-primary" aria-hidden="true"></i> Bagaimana cara membayar SPP?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Untuk membayar SPP:</p>
+                <ol>
+                    <li>Buka halaman <strong>Biaya Kuliah</strong></li>
+                    <li>Masukkan NIM Anda (contoh: 2024001)</li>
+                    <li>Klik <strong>"Cek Data"</strong></li>
+                    <li>Centang cicilan yang ingin dibayar</li>
+                    <li>Klik <strong>"Lanjut ke Pembayaran"</strong></li>
+                    <li>Pilih metode pembayaran dan konfirmasi</li>
+                </ol>
+                <small class="text-muted">Anda bisa memilih beberapa cicilan sekaligus.</small>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="pulsa paket data hp nomor provider" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-phone me-2 text-primary" aria-hidden="true"></i> Bagaimana cara isi pulsa?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Untuk mengisi pulsa:</p>
+                <ol>
+                    <li>Buka halaman <strong>Isi Pulsa</strong></li>
+                    <li>Masukkan nomor HP (08xxxxxxxxxx)</li>
+                    <li>Provider akan terdeteksi otomatis</li>
+                    <li>Pilih nominal pulsa atau paket data</li>
+                    <li>Pilih metode pembayaran dan konfirmasi</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="riwayat transaksi cetak struk pdf print" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clock-history me-2 text-primary" aria-hidden="true"></i> Bagaimana melihat dan mencetak riwayat?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Untuk melihat riwayat:</p>
+                <ol>
+                    <li>Buka halaman <strong>Riwayat Transaksi</strong></li>
+                    <li>Gunakan filter untuk mencari transaksi tertentu</li>
+                    <li>Klik transaksi untuk melihat detail</li>
+                    <li>Klik <strong>"Cetak"</strong> untuk print struk</li>
+                    <li>Klik <strong>"Download PDF"</strong> untuk menyimpan sebagai PDF</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="qris virtual account teller pembayaran metode" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-credit-card me-2 text-primary" aria-hidden="true"></i> Metode pembayaran apa saja yang tersedia?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Tersedia 3 metode pembayaran:</p>
+                <ul>
+                    <li><strong>Virtual Account</strong> — Transfer via ATM/mBanking BCA, BNI, atau Mandiri</li>
+                    <li><strong>QRIS</strong> — Scan QR Code dengan e-wallet (GoPay, OVO, Dana, dll)</li>
+                    <li><strong>Teller/Kasir</strong> — Bayar langsung dengan kode bayar</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="data contoh dummy id pelanggan nim" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-database me-2 text-primary" aria-hidden="true"></i> Data contoh apa yang bisa dicoba?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p><strong>PLN:</strong> 123456789012, 234567890123, 345678901234, 456789012345, 567890123456</p>
+                <p><strong>PDAM:</strong> PDAM001, PDAM002, PDAM003</p>
+                <p><strong>Internet:</strong> INET001, INET002, INET003</p>
+                <p><strong>SPP (NIM):</strong> 2024001, 2024002, 2024003</p>
+                <p><strong>Seminar:</strong> bebas (alfanumerik 4-20 karakter)</p>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-3 faq-item" data-keywords="dark mode tema gelap terang" role="listitem">
+            <div class="card-header cursor-pointer" onclick="toggleFAQ(this)" aria-expanded="false" 
+                 role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') toggleFAQ(this)">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-moon-stars me-2 text-primary" aria-hidden="true"></i> Bagaimana mengubah tema?</span>
+                    <i class="bi bi-chevron-down transition-icon" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="card-body faq-answer" style="display:none;" role="region" aria-label="Jawaban">
+                <p>Klik ikon <strong>bulan/matahari</strong> di pojok kanan atas untuk beralih antara tema terang dan gelap. Preferensi tema akan disimpan otomatis.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tidak ada hasil -->
+    <div id="faqEmpty" style="display:none;" class="text-center py-5" role="status" aria-live="polite">
+        <i class="bi bi-search fs-1 text-muted" aria-hidden="true"></i>
+        <h6 class="text-muted mt-3">Tidak ada hasil</h6>
+        <p class="text-muted small">Coba kata kunci lain</p>
+    </div>
+
+    <!-- Kontak -->
+    <div class="card card-custom mt-4">
+        <div class="card-header fw-bold">📞 Hubungi Kami</div>
+        <div class="card-body text-center">
+            <p class="text-muted small">Masih ada pertanyaan? Hubungi tim support kami.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-outline-primary btn-sm" aria-label="Hubungi via WhatsApp">
+                    <i class="bi bi-whatsapp me-1" aria-hidden="true"></i> WhatsApp
+                </button>
+                <button class="btn btn-outline-primary btn-sm" aria-label="Hubungi via Email">
+                    <i class="bi bi-envelope me-1" aria-hidden="true"></i> Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer class="app-footer" role="contentinfo">
+    <div>
+        <span class="fw-semibold small">🌱 SeumpamaBayar</span>
+        <span class="text-muted small ms-2">© 2024. All rights reserved.</span>
+    </div>
+    <div class="d-flex gap-3">
+        <a href="faq.html" class="text-muted small text-decoration-none">Bantuan</a>
+        <a href="#" class="text-muted small text-decoration-none">Privasi</a>
+        <a href="#" class="text-muted small text-decoration-none">Kontak</a>
+    </div>
+</footer>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initTheme();
+        updateThemeIcon();
+    });
+
+    function toggleThemeButton() {
+        const theme = toggleTheme();
+        updateThemeIcon();
+        showToast(`Tema ${theme === 'dark' ? 'gelap' : 'terang'} diaktifkan`, 'info');
+    }
+
+    function updateThemeIcon() {
+        const btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.innerHTML = isDark 
+            ? '<i class="bi bi-sun" aria-hidden="true"></i>' 
+            : '<i class="bi bi-moon-stars" aria-hidden="true"></i>';
+    }
+
+    function toggleFAQ(header) {
+        const body = header.nextElementSibling;
+        const icon = header.querySelector('.transition-icon');
+        const isOpen = body.style.display === 'block';
+
+        // Close all
+        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+        document.querySelectorAll('.transition-icon').forEach(i => {
+            i.style.transform = 'rotate(0deg)';
+        });
+        document.querySelectorAll('.faq-item .card-header').forEach(h => {
+            h.setAttribute('aria-expanded', 'false');
+        });
+
+        // Open clicked
+        if (!isOpen) {
+            body.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            header.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    function filterFAQ() {
+        const search = document.getElementById('searchFAQ').value.toLowerCase();
+        const items = document.querySelectorAll('.faq-item');
+        let found = false;
+
+        items.forEach(item => {
+            const keywords = item.dataset.keywords || '';
+            if (search === '' || keywords.includes(search)) {
+                item.style.display = '';
+                found = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        document.getElementById('faqEmpty').style.display = found ? 'none' : 'block';
+    }
+</script>
+
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .transition-icon {
+        transition: transform 0.3s ease;
+        font-size: 0.8rem;
+    }
+    .faq-answer {
+        border-top: 1px solid #e8ecf0;
+    }
+    [data-theme="dark"] .faq-answer {
+        border-color: #334155;
+    }
+</style>
+
+</body>
+</html>
