@@ -1,11 +1,23 @@
 // ==================== LOGIC DASHBOARD ====================
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    const user = JSON.parse(localStorage.getItem('user') || '{"nama":"Budi Darmawan","nim":"221011450661"}');
+
+    const topbarName = document.getElementById('topbarName');
+    if (topbarName) topbarName.textContent = user.nama;
+
+    const avatar = document.getElementById('topbarAvatar');
+    if (avatar) avatar.textContent = user.nama.charAt(0).toUpperCase();
+
     updateTanggal();
     updateSaldo();
     renderStatCards();
     renderRiwayatTerakhir();
     initChart();
+
+    initTheme();
+    updateThemeIcon();
 });
 
 function updateTanggal() {
