@@ -193,13 +193,8 @@ function initChart() {
 }
 
 function setKategori(kategori) {
-    // Simpan kategori ke sessionStorage agar halaman bayar-tagihan bisa membacanya
     sessionStorage.setItem('selectedKategori', kategori);
 }
-
-// Init theme
-initTheme();
-updateThemeIcon();
 
 function toggleThemeButton() {
     const theme = toggleTheme();
@@ -214,6 +209,7 @@ function updateThemeIcon() {
     btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
 }
 
+// ✅ Fungsi Isi Saldo
 function isiSaldo() {
     const nominal = prompt('Masukkan nominal saldo (min Rp 50.000):', '500000');
     if (nominal && !isNaN(nominal) && parseInt(nominal) >= 50000) {
@@ -226,6 +222,7 @@ function isiSaldo() {
     }
 }
 
+// ✅ Fungsi Transfer
 function transferSaldo() {
     showToast('Fitur transfer sedang dalam pengembangan', 'info');
 }
