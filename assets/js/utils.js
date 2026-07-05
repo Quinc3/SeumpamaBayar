@@ -39,6 +39,10 @@ function generateVA(bank = 'random') {
     return { number: va, bank: selectedBank.name, code: selectedBank.code };
 }
 
+function generateKodeBayar() {
+    return 'T' + Math.floor(Math.random() * 10000000000000);
+}
+
 function validasiIdPelanggan(id, kategori) {
     if (kategori === 'seminar') return /^[a-zA-Z0-9]{4,20}$/.test(id);
     return /^\d{8,12}$/.test(id);
