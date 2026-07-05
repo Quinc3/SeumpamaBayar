@@ -68,8 +68,6 @@ function deteksiOtomatis() {
         return;
     }
 
-    // ✅ Hapus validasi panjang di bawah — sudah ditangani validasiNomorHP
-
     providerInfo.style.display = 'block';
     document.getElementById('providerName').textContent = currentProvider;
     inputEl.classList.add('is-valid');
@@ -128,14 +126,23 @@ function pilihJenis(jenis) {
 }
 
 function pilihItem(jenis, nama, harga, el) {
-    const container = jenis === 'pulsa' ? '#nominalContainer' : '#paketContainer';
-    document.querySelectorAll(container + ' .kategori-card').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
+    if (el) {
+        const container = jenis === 'pulsa' ? '#nominalContainer' : '#paketContainer';
+        document.querySelectorAll(container + ' .kategori-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
 
     selectedItem = nama;
     selectedHarga = harga;
     currentJenis = jenis;
 
+    // Tampilkan preview
+    tampilkanPreview();
+    // Tampilkan metode bayar
+    tampilkanMetodeBayar();
+}
+
+function tampilkanPreview() {
     document.getElementById('previewCard').style.display = 'block';
     document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth' });
     document.getElementById('previewContent').innerHTML = `
@@ -143,15 +150,17 @@ function pilihItem(jenis, nama, harga, el) {
             <div class="col-md-8">
                 <div class="detail-row"><span class="label">Provider</span><span class="value">${currentProvider}</span></div>
                 <div class="detail-row"><span class="label">Nomor</span><span class="value">${maskNomor(currentNomor)}</span></div>
-                <div class="detail-row"><span class="label">Jenis</span><span class="value">${jenis === 'pulsa' ? 'Pulsa Reguler' : 'Paket Data'}</span></div>
-                <div class="detail-row"><span class="label">Produk</span><span class="value fw-bold">${nama}</span></div>
+                <div class="detail-row"><span class="label">Jenis</span><span class="value">${currentJenis === 'pulsa' ? 'Pulsa Reguler' : 'Paket Data'}</span></div>
+                <div class="detail-row"><span class="label">Produk</span><span class="value fw-bold">${selectedItem}</span></div>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <small class="text-muted">Total Bayar</small>
-                <h4 class="fw-bold text-primary">${formatRupiah(harga)}</h4>
+                <h4 class="fw-bold text-primary">${formatRupiah(selectedHarga)}</h4>
             </div>
         </div>`;
+}
 
+function tampilkanMetodeBayar() {
     document.getElementById('metodeCard').style.display = 'block';
     document.getElementById('metodeCard').scrollIntoView({ behavior: 'smooth' });
     document.getElementById('btnBayarPulsa').disabled = true;
@@ -170,7 +179,6 @@ function pilihMetode(metode, el) {
     detailDiv.innerHTML = '';
 
     if (metode === 'va') {
-        // ✅ Pakai format baru
         const vaData = generateVA();
         detailDiv.innerHTML = `
             <div class="text-center p-3 bg-light rounded-3 fade-in">
@@ -217,7 +225,6 @@ function pilihMetode(metode, el) {
     }
 }
 
-// ✅ Fungsi gantiBank untuk Pulsa
 function gantiBankPulsa(bank) {
     const vaData = generateVA(bank);
     const detailDiv = document.getElementById('metodeDetail');
@@ -404,7 +411,14 @@ function cetakStrukPulsa(id) {
     document.getElementById('modalPilihanCetakPulsa').addEventListener('hidden.bs.modal', cleanup);
 }
 
+// ==================== CUSTOM NOMINAL ====================
+
 function showCustomInput() {
+    // Hapus modal lama jika ada
+    const oldModal = document.getElementById('modalCustomNominal');
+    if (oldModal) oldModal.remove();
+
+    // Reset pilihan yang sedang aktif
     document.querySelectorAll('#nominalContainer .kategori-card, #paketContainer .kategori-card')
         .forEach(c => c.classList.remove('active'));
 
@@ -413,51 +427,66 @@ function showCustomInput() {
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h6 class="modal-title fw-bold">Nominal Custom</h6>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h6 class="modal-title fw-bold">Nominal Pulsa Lainnya</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
                     <div class="modal-body">
-                        <label class="form-label small">Masukkan nominal (min Rp 5.000)</label>
+                        <label class="form-label small fw-semibold">Masukkan nominal (min Rp 5.000)</label>
                         <input type="number" class="form-control" id="customNominal" 
-                               placeholder="Contoh: 15000" min="5000" step="1000">
+                               placeholder="Contoh: 15000" min="5000" step="1000" value="15000">
                         <div class="invalid-feedback d-block" id="customNominalError"></div>
+                        <small class="text-muted">Harus kelipatan Rp 1.000</small>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="submitCustomNominal()">Pilih</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="submitCustomNominal()">
+                            <i class="bi bi-check-lg me-1"></i> Pilih Nominal
+                        </button>
                     </div>
                 </div>
             </div>
         </div>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    const modal = new bootstrap.Modal(document.getElementById('modalCustomNominal'));
+
+    const modalEl = document.getElementById('modalCustomNominal');
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
 
-    document.getElementById('modalCustomNominal').addEventListener('hidden.bs.modal', function () {
-        this.remove();
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        modalEl.remove();
     });
 }
 
 function submitCustomNominal() {
-    const nominal = parseInt(document.getElementById('customNominal').value);
+    const inputEl = document.getElementById('customNominal');
     const errorEl = document.getElementById('customNominalError');
+    const nominal = parseInt(inputEl?.value);
 
-    errorEl.textContent = '';
+    if (errorEl) errorEl.textContent = '';
 
     if (!nominal || nominal < 5000) {
-        errorEl.textContent = 'Minimal Rp 5.000';
+        if (errorEl) errorEl.textContent = 'Minimal Rp 5.000';
         return;
     }
 
     if (nominal % 1000 !== 0) {
-        errorEl.textContent = 'Harus kelipatan Rp 1.000';
+        if (errorEl) errorEl.textContent = 'Harus kelipatan Rp 1.000';
         return;
     }
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalCustomNominal'));
-    modal.hide();
+    const modalEl = document.getElementById('modalCustomNominal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
 
-    const customCard = document.querySelector('[data-nominal="custom"]');
-    pilihItem('pulsa', `Pulsa ${formatRupiah(nominal)}`, nominal, customCard);
+    // Update state langsung tanpa elemen
+    selectedItem = `Pulsa Rp ${nominal.toLocaleString('id-ID')}`;
+    selectedHarga = nominal;
+    currentJenis = 'pulsa';
+
+    // Tampilkan preview & metode bayar
+    tampilkanPreview();
+    tampilkanMetodeBayar();
+
+    showToast(`Nominal Rp ${nominal.toLocaleString('id-ID')} dipilih`, 'success');
 }
