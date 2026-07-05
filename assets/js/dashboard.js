@@ -213,3 +213,19 @@ function updateThemeIcon() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     btn.innerHTML = isDark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
 }
+
+function isiSaldo() {
+    const nominal = prompt('Masukkan nominal saldo (min Rp 50.000):', '500000');
+    if (nominal && !isNaN(nominal) && parseInt(nominal) >= 50000) {
+        const saldo = Storage.get('saldo', 0);
+        Storage.set('saldo', saldo + parseInt(nominal));
+        updateSaldo();
+        showToast(`Saldo berhasil ditambah ${formatRupiah(parseInt(nominal))}`, 'success');
+    } else if (nominal) {
+        showToast('Minimal Rp 50.000', 'error');
+    }
+}
+
+function transferSaldo() {
+    showToast('Fitur transfer sedang dalam pengembangan', 'info');
+}
